@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -17,13 +19,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -31,32 +36,41 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class AbsenFragment extends Fragment {
 
     TextInputLayout ket;
-    String keterangan;
-
-    TextView inhere, tanggal, jam;
+    TextView inhere, tanggal, jam, waktuAbsen;
     Button hadir, izin;
     ProgressBar progressBar;
     FusedLocationProviderClient LocationProvider;
     ImageButton nxt, prev;
+    ImageView done;
+    AnimatedVectorDrawableCompat avd;
+    AnimatedVectorDrawable avd2;
+
+    String userLogin, eventDate;
 
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("user");
 
-    LocationManager locationManager ;
-    boolean GpsStatus ;
+    LocationManager locationManager;
+    boolean GpsStatus;
 
     double aoiLat = 0.4524095;
     double aoiLong = 101.4141706;
@@ -65,7 +79,9 @@ public class AbsenFragment extends Fragment {
     double longitude;
 
     DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
+    DateFormat dateRekap = new SimpleDateFormat("ddMMyyyy");
     DateFormat jamFormat = new SimpleDateFormat("HH:mm:ss");
+    DateFormat jamAbsen = new SimpleDateFormat("HH:mm");
     Calendar calendar = Calendar.getInstance();
 
     public static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
@@ -81,6 +97,7 @@ public class AbsenFragment extends Fragment {
     }
 
     private void layoutBinding(View root){
+        userLogin = Preferences.getDataUsername(requireContext());
         inhere = root.findViewById(R.id.ditempat);
         tanggal = root.findViewById(R.id.tanggal);
         jam = root.findViewById(R.id.jam);
@@ -88,6 +105,8 @@ public class AbsenFragment extends Fragment {
         izin = root.findViewById(R.id.izin);
         nxt = root.findViewById(R.id.next);
         prev = root.findViewById(R.id.previous);
+        done = root.findViewById(R.id.icon_done);
+        waktuAbsen = root.findViewById(R.id.jam_absen);
         progressBar = root.findViewById(R.id.progresbar);
         LocationProvider = LocationServices.getFusedLocationProviderClient(requireContext());
     }
@@ -127,20 +146,23 @@ public class AbsenFragment extends Fragment {
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, monthOfYear);
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            updateTgl();
+            setTanggal();
         };
 
         tanggal.setOnClickListener(v -> {
             calendar.setTime(Calendar.getInstance().getTime());
-            new DatePickerDialog(requireContext(), R.style.my_dialog_theme, date, calendar
-                    .get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)).show();
+            DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), R.style.my_dialog_theme, date,
+                    calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+            datePickerDialog.show();
         });
     }
 
-    private void updateTgl() {
-        Date today = calendar.getTime();
-        tanggal.setText(dateFormat.format(today));
+    @Override
+    public void onStart() {
+        super.onStart();
+        setTanggal();
     }
 
     private void dialogKeterangan() {
@@ -152,10 +174,15 @@ public class AbsenFragment extends Fragment {
                 .setCancelable(false);
         ket = dialogView.findViewById(R.id.edit_izin);
         builder.setPositiveButton("Submit", (dialog, which) -> {
-           keterangan = ket.getEditText().getText().toString();
-           hadir.setEnabled(false);
-           izin.setClickable(false);
-           izin.setBackgroundColor(getResources().getColor(R.color.orange));
+            String keterangan = ket.getEditText().getText().toString();
+            String tggl = AbsenFragment.this.dateRekap.format(new Date().getTime());
+            String jamAbsen = AbsenFragment.this.jamAbsen.format(new Date().getTime());
+            String stathadir = "izin";
+
+           AbsenData absenData = new AbsenData(stathadir, jamAbsen, keterangan);
+           databaseReference.child(userLogin).child("sAbsensi").child(tggl).setValue(absenData).addOnFailureListener(e -> {
+               Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
+           });
            dialog.dismiss();
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> {
@@ -166,7 +193,10 @@ public class AbsenFragment extends Fragment {
 
     private void setTanggal(){
         String curentDate = dateFormat.format(calendar.getTime());
+        eventDate = dateRekap.format(calendar.getTime());
         tanggal.setText(curentDate);
+        showAbsenToday();
+        seleksiAbsen();
     }
 
     private void setJam(){
@@ -207,10 +237,8 @@ public class AbsenFragment extends Fragment {
                             hadir.setBackgroundColor(Color.RED);
                             inhere.setText("Anda tidak berada di lokasi!");
                         } else {
-                            izin.setEnabled(false);
-                            hadir.setClickable(false);
-                            hadir.setBackgroundColor(Color.GREEN);
-                            inhere.setText("Anda berada di lokasi!");
+                            absenRekap();
+                            validHadir();
                         }
                     }
                         progressBar.setVisibility(View.INVISIBLE);
@@ -228,6 +256,7 @@ public class AbsenFragment extends Fragment {
     public void onResume() {
         super.onResume();
         GPSStatus();
+        setTanggal();
     }
 
     private boolean inLocation(){
@@ -235,5 +264,105 @@ public class AbsenFragment extends Fragment {
         Location.distanceBetween(aoiLat, aoiLong, latitude, longitude, results);
         float distanceInMeters = results[0];
         return distanceInMeters < 100;
+    }
+
+    private void absenRekap(){
+        String tggl = AbsenFragment.this.dateRekap.format(new Date().getTime());
+        String jamAbsen = AbsenFragment.this.jamAbsen.format(new Date().getTime());
+        String ketHadir = getString(R.string.ket_hadir);
+        String hadir = "hadir";
+
+        AbsenData absenData = new AbsenData(hadir, jamAbsen, ketHadir);
+        databaseReference.child(userLogin).child("sAbsensi").child(tggl).setValue(absenData).addOnFailureListener(e -> {
+            Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void showAbsenToday(){
+        databaseReference.child(userLogin).child("sAbsensi").child(eventDate).addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot snapshot) {
+               if (snapshot.exists()){
+                   String kehadiran = snapshot.child("sKehadiran").getValue().toString();
+                   String jamAbsen = snapshot.child("sJam").getValue().toString();
+                   String ketHadir = snapshot.child("sKet").getValue().toString();
+
+                   if (kehadiran.equals("hadir")){
+                       waktuAbsen.setText(jamAbsen);
+                       inhere.setText(ketHadir);
+                       validHadir();
+                   } else if (kehadiran.equals("izin")){
+                       waktuAbsen.setText(jamAbsen);
+                       inhere.setText(ketHadir);
+                       validIzin();
+                   } else {
+                       seleksiAbsen();
+                   }
+               }
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError error) {
+
+           }
+       });
+    }
+
+    private void validHadir(){
+        done.setVisibility(View.VISIBLE);
+        Drawable drawable = done.getDrawable();
+
+        if (drawable instanceof AnimatedVectorDrawableCompat){
+            avd = (AnimatedVectorDrawableCompat) drawable;
+            avd.start();
+        } else if (drawable instanceof AnimatedVectorDrawable){
+            avd2 = (AnimatedVectorDrawable) drawable;
+            avd2.start();
+        }
+
+        izin.setEnabled(false);
+        hadir.setClickable(false);
+        hadir.setEnabled(true);
+        hadir.setBackgroundColor(Color.GREEN);
+    }
+
+    private void validIzin(){
+        done.setVisibility(View.INVISIBLE);
+        hadir.setEnabled(false);
+        izin.setClickable(false);
+        izin.setBackgroundColor(getResources().getColor(R.color.orange));
+        hadir.setBackgroundColor(getResources().getColor(R.color.shot_black));
+    }
+
+    private void validNoData(){
+        done.setVisibility(View.INVISIBLE);
+        izin.setEnabled(false);
+        hadir.setEnabled(false);
+        hadir.setBackgroundColor(getResources().getColor(R.color.shot_black));
+        izin.setBackgroundColor(getResources().getColor(R.color.shot_black));
+    }
+
+    private void belumAbsen(){
+        done.setVisibility(View.INVISIBLE);
+        izin.setEnabled(true);
+        hadir.setClickable(true);
+        hadir.setBackgroundColor(getResources().getColor(R.color.purple_500));
+    }
+
+    private void seleksiAbsen(){
+        String curentDate = dateFormat.format(calendar.getTime());
+        String tgglNow = AbsenFragment.this.dateFormat.format(new Date().getTime());
+        if (curentDate.equals(tgglNow)){
+            nxt.setEnabled(false);
+            nxt.setImageDrawable(getResources().getDrawable(R.drawable.ic_next_disabled));
+            belumAbsen();
+            inhere.setText("Anda belum absen hari ini!");
+        } else {
+            nxt.setEnabled(true);
+            nxt.setImageDrawable(getResources().getDrawable(R.drawable.ic_next));
+            validNoData();
+            waktuAbsen.setText("-");
+            inhere.setText("Tidak ada data absen!");
+        }
     }
 }

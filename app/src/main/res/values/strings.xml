@@ -5,4 +5,5 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="logout">Logout</string>
+    <string name="ket_hadir">Anda sudah absen hari ini!</string>
 </resources>
