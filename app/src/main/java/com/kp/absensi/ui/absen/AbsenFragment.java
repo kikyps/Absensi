@@ -330,6 +330,7 @@ public class AbsenFragment extends Fragment {
         done.setVisibility(View.INVISIBLE);
         hadir.setEnabled(false);
         izin.setClickable(false);
+        izin.setEnabled(true);
         izin.setBackgroundColor(getResources().getColor(R.color.orange));
         hadir.setBackgroundColor(getResources().getColor(R.color.shot_black));
     }
@@ -345,7 +346,10 @@ public class AbsenFragment extends Fragment {
     private void belumAbsen(){
         done.setVisibility(View.INVISIBLE);
         izin.setEnabled(true);
+        izin.setEnabled(true);
+        hadir.setEnabled(true);
         hadir.setClickable(true);
+        izin.setBackgroundColor(getResources().getColor(R.color.purple_500));
         hadir.setBackgroundColor(getResources().getColor(R.color.purple_500));
     }
 

@@ -3,6 +3,7 @@ package com.kp.absensi.common;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.AdminActivity;
 import com.kp.absensi.MainActivity;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
@@ -43,27 +45,22 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!validateUsername() | !validatePassword()) {
-                    return;
                 } else {
-                    turnLogin(this);
+                    turnLogin();
                 }
             }
         });
 
         Button register = findViewById(R.id.register_akun);
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
-                startActivity(intent);
-                LoginActivity.this.finish();
-            }
+        register.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+            startActivity(intent);
+            LoginActivity.this.finish();
         });
     }
 
 
-    private void turnLogin(View.OnClickListener onClickListener) {
-
+    private void turnLogin() {
         String input1 = usernameValid.getEditText().getText().toString();
         String input2 = passwordValid.getEditText().getText().toString();
 
@@ -75,13 +72,24 @@ public class LoginActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     String passwordFromDB = snapshot.child(input1).child("sPassword").getValue(String.class);
                     String nameFromDB = snapshot.child(input1).child("sNama").getValue(String.class);
+                    String status = snapshot.child(input1).child("sStatus").getValue(String.class);
 
                     if (passwordFromDB.equals(input2)) {
-                        Preferences.setDataLogin(LoginActivity.this, true);
-                        Preferences.setDataNama(LoginActivity.this, nameFromDB);
-                        Preferences.setDataUsername(LoginActivity.this, input1);
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
+                        if (status.equals("admin")){
+                            Preferences.setDataLogin(LoginActivity.this, true);
+                            Preferences.setDataStatus(LoginActivity.this, status);
+                            Preferences.setDataNama(LoginActivity.this, nameFromDB);
+                            Preferences.setDataUsername(LoginActivity.this, input1);
+                            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                            startActivity(intent);
+                        } else if (status.equals("user")) {
+                            Preferences.setDataLogin(LoginActivity.this, true);
+                            Preferences.setDataStatus(LoginActivity.this, status);
+                            Preferences.setDataNama(LoginActivity.this, nameFromDB);
+                            Preferences.setDataUsername(LoginActivity.this, input1);
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(), "Password salah!", Toast.LENGTH_SHORT).show();
                     }
@@ -146,8 +154,13 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (Preferences.getDataLogin(this)) {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            if (Preferences.getDataStatus(this).equals("admin")){
+                startActivity(new Intent(this, AdminActivity.class));
+                finish();
+            } else {
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            }
         }
     }
 

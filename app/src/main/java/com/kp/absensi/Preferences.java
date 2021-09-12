@@ -7,7 +7,8 @@ import android.preference.PreferenceManager;
 public class Preferences {
 
     private static final String DATA_LOGIN = "status_login",
-            DATA_NAMA = "nama", DATA_USERNAME = "username";
+            DATA_NAMA = "nama", DATA_USERNAME = "username"
+            , DATA_STATUS = "status";
 
     private static SharedPreferences getSharedPreferences(Context context){
         return PreferenceManager.getDefaultSharedPreferences(context);
@@ -43,8 +44,19 @@ public class Preferences {
         return getSharedPreferences(context).getBoolean(DATA_LOGIN,false);
     }
 
+    public static void setDataStatus(Context context, String data){
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putString(DATA_STATUS,data);
+        editor.apply();
+    }
+
+    public static String getDataStatus(Context context){
+        return getSharedPreferences(context).getString(DATA_STATUS,"");
+    }
+
     public static void clearData(Context context){
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.remove(DATA_STATUS);
         editor.remove(DATA_NAMA);
         editor.remove(DATA_USERNAME);
         editor.remove(DATA_LOGIN);

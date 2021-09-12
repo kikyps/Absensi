@@ -16,9 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Location">
         <activity
-            android:name=".ui.akun.EditProfile"
-            android:label="Edit profil"
+            android:name=".AdminActivity"
             android:exported="true" />
+        <activity
+            android:name=".ui.akun.EditProfile"
+            android:exported="true"
+            android:label="Edit profil" />
         <activity
             android:name=".common.RegisterActivity"
             android:exported="true"

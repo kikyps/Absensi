@@ -5,26 +5,21 @@ import java.util.Map;
 
 public class StoreUser {
 
-    String key, sNama, sUsername, sPassword;
+    String sStatus, sNama, sUsername, sPassword;
 
-    public StoreUser(String sNama, String sUsername, String sPassword) {
+    public StoreUser(String sStatus, String sNama, String sUsername, String sPassword) {
+        this.sStatus = sStatus;
         this.sNama = sNama;
         this.sUsername = sUsername;
         this.sPassword = sPassword;
     }
 
-    public Map<String, Object> cnName(){
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("sNama", sNama);
-        return result;
+    public String getsStatus() {
+        return sStatus;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+    public void setsStatus(String sStatus) {
+        this.sStatus = sStatus;
     }
 
     public String getsNama() {

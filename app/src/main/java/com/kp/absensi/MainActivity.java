@@ -93,20 +93,12 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Logout")
                 .setMessage("Anda yakin ingin logout?")
-                .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                        Preferences.clearData(getApplicationContext());
-                        finish();
-                    }
+                .setPositiveButton("Ya", (dialogInterface, i) -> {
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    Preferences.clearData(getApplicationContext());
+                    finish();
                 })
-                .setNegativeButton("tidak", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
+                .setNegativeButton("tidak", (dialogInterface, i) -> dialogInterface.cancel());
         AlertDialog alertDialog = builder.create();
         alertDialog.setCancelable(true);
         alertDialog.show();
