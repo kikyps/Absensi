@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "863313710117",
+    "firebase_url": "https://absensi-a248f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "absensi-a248f",
+    "storage_bucket": "absensi-a248f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863313710117:android:66284006a7ed2e7d4c03cc",
+        "android_client_info": {
+          "package_name": "com.kp.absensi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "863313710117-urtttst4bh9svoh09c94jvp267nung9r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMvU7GPPd6MV43XoYBjNXyzhirQoheQJ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "863313710117-urtttst4bh9svoh09c94jvp267nung9r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

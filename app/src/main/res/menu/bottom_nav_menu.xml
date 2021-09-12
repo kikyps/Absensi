@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_absen"
+        android:icon="@drawable/ic_absen"
+        android:title="@string/title_absen" />
+
+    <item
+        android:id="@+id/navigation_account"
+        android:icon="@drawable/ic_user"
+        android:title="Akun" />
+
+</menu>
