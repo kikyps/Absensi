@@ -212,6 +212,7 @@ public class AbsenFragment extends Fragment {
                 .setCancelable(false);
         ket = dialogView.findViewById(R.id.edit_izin);
         builder.setPositiveButton("Submit", (dialog, which) -> {
+            progressBar.setVisibility(View.INVISIBLE);
             String keterangan = ket.getEditText().getText().toString();
             String tggl = AbsenFragment.this.dateRekap.format(new Date().getTime());
             String jamAbsen = AbsenFragment.this.jamAbsen.format(new Date().getTime());
