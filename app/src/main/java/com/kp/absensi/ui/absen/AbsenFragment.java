@@ -386,7 +386,7 @@ public class AbsenFragment extends Fragment {
     private void belumAbsen(){
         done.setVisibility(View.INVISIBLE);
         izin.setEnabled(true);
-        izin.setEnabled(true);
+        izin.setClickable(true);
         hadir.setEnabled(true);
         hadir.setClickable(true);
         izin.setBackgroundColor(getResources().getColor(R.color.purple_500));
