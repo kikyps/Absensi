@@ -176,7 +176,8 @@ public class EditProfile extends AppCompatActivity {
                         if (!val.equals(passwordprof)){
                             passwordLama.setError("Password lama anda salah!");
                         } else if (!validatePassword()){
-
+                            passwordLama.setError(null);
+                            passwordLama.setErrorEnabled(false);
                         } else {
                             Map<String, Object> updatesNamaPass = new HashMap<>();
                             updatesNamaPass.put("sNama", name);
@@ -223,7 +224,7 @@ public class EditProfile extends AppCompatActivity {
             passwordBaru.setError("Password terlalu pendek!");
             return false;
         } else if (!val2.equals(val3)){
-            passConfirm.setError("Password anda tidak sama dengan password sebelumnya!");
+            confirmPass.setError("Password anda tidak sama dengan password sebelumnya!");
             return false;
         } else  {
             passwordBaru.setError(null);

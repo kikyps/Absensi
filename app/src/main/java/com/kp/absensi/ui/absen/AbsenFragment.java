@@ -41,8 +41,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.MainActivity;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
+import com.kp.absensi.admin.AdminActivity;
+import com.kp.absensi.common.LoginActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -72,8 +75,11 @@ public class AbsenFragment extends Fragment {
     LocationManager locationManager;
     boolean GpsStatus;
 
-    double aoiLat = 0.4524095;
-    double aoiLong = 101.4141706;
+//    double aoiLat = 0.4524095;
+//    double aoiLong = 101.4141706;
+
+    double aoiLat;
+    double aoiLong;
 
     double latitude;
     double longitude;
@@ -162,7 +168,39 @@ public class AbsenFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        getLatlong();
         setTanggal();
+    }
+
+    private void getLatlong(){
+        DatabaseReference dataLatlong = FirebaseDatabase.getInstance().getReference();
+        dataLatlong.child("data").child("latlong").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String latitudeValue = snapshot.child("sLatitude").getValue().toString();
+                    String longitudeValue = snapshot.child("sLongitude").getValue().toString();
+
+                    aoiLat = Double.parseDouble(latitudeValue);
+                    aoiLong = Double.parseDouble(longitudeValue);
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                    builder.setTitle("Warning")
+                            .setMessage("Data kordinat kosong, isikan kordinat lokasi absen untuk menggunakan aplikasi ini!\n\nAtau anda bisa menghubungi admin.")
+                            .setPositiveButton("Oke", (dialogInterface, i) -> {
+                                startActivity(new Intent(requireContext(), LoginActivity.class));
+                                Preferences.clearData(requireContext());
+                            });
+                    builder.setCancelable(false);
+                    builder.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void dialogKeterangan() {
@@ -235,7 +273,7 @@ public class AbsenFragment extends Fragment {
                             izin.setEnabled(true);
                             hadir.setClickable(true);
                             hadir.setBackgroundColor(Color.RED);
-                            inhere.setText("Anda tidak berada di lokasi!");
+                            Toast.makeText(requireContext(), "Anda tidak berada di lokasi!", Toast.LENGTH_SHORT).show();
                         } else {
                             absenRekap();
                             validHadir();
@@ -255,6 +293,7 @@ public class AbsenFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        getLatlong();
         GPSStatus();
         setTanggal();
     }
@@ -324,6 +363,7 @@ public class AbsenFragment extends Fragment {
         hadir.setClickable(false);
         hadir.setEnabled(true);
         hadir.setBackgroundColor(Color.GREEN);
+        izin.setBackgroundColor(getResources().getColor(R.color.shot_black));
     }
 
     private void validIzin(){
@@ -360,6 +400,7 @@ public class AbsenFragment extends Fragment {
             nxt.setEnabled(false);
             nxt.setImageDrawable(getResources().getDrawable(R.drawable.ic_next_disabled));
             belumAbsen();
+            waktuAbsen.setText("-");
             inhere.setText("Anda belum absen hari ini!");
         } else {
             nxt.setEnabled(true);

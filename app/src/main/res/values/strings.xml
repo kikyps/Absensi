@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Absensi</string>
-    <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_activity_main">MainActivity</string>
     <string name="title_absen">Absen</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="logout">Logout</string>
     <string name="ket_hadir">Anda sudah absen hari ini!</string>
+    <string name="admin_title">Admin</string>
 </resources>

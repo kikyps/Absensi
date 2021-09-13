@@ -7,6 +7,10 @@
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_next.xml" value="0.25925925925925924" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_previous.xml" value="0.2703125" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_previous_disabled.xml" value="0.2703125" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/layout/activity_admin.xml" value="0.25416666666666665" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/layout/activity_edit_profile.xml" value="0.25416666666666665" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/layout/activity_login.xml" value="0.25416666666666665" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/layout/activity_maps.xml" value="0.25416666666666665" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/layout/fragment_absen.xml" value="0.25025641025641027" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/layout/fragment_akun.xml" value="0.25416666666666665" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/admin_menu.xml" value="0.25416666666666665" />
