@@ -83,12 +83,22 @@ public class AdminActivity extends AppCompatActivity {
         String getlat = latitude.getEditText().getText().toString();
         String getLong = longitude.getEditText().getText().toString();
 
-        DataKordinat dataKordinat = new DataKordinat(getlat, getLong);
-        databaseReference.child("data").child("latlong").setValue(dataKordinat).addOnSuccessListener(unused -> {
-            Toast.makeText(AdminActivity.this, "Data berhasil disimpan", Toast.LENGTH_SHORT).show();
-        }).addOnFailureListener(e -> {
-            Toast.makeText(AdminActivity.this, "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
-        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Konfirmasi")
+                .setMessage("Apakah anda yakin ingin mengedit data ini?")
+                .setPositiveButton("ya", (dialogInterface, i) -> {
+                    DataKordinat dataKordinat = new DataKordinat(getlat, getLong);
+                    databaseReference.child("data").child("latlong").setValue(dataKordinat).addOnSuccessListener(unused -> {
+                        Toast.makeText(AdminActivity.this, "Data berhasil disimpan", Toast.LENGTH_SHORT).show();
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(AdminActivity.this, "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .setNegativeButton("cancel", (dialogInterface, i) -> {
+                    dialogInterface.cancel();
+                });
+        builder.setCancelable(true);
+        builder.show();
     }
 
     private TextWatcher latlong = new TextWatcher() {
