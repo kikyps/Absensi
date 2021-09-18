@@ -1,4 +1,4 @@
-package com.kp.absensi.ui.absen;
+package com.kp.absensi.user.ui.absen;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -27,6 +26,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
@@ -41,18 +41,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.kp.absensi.MainActivity;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
-import com.kp.absensi.admin.AdminActivity;
 import com.kp.absensi.common.LoginActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -68,6 +64,8 @@ public class AbsenFragment extends Fragment {
     AnimatedVectorDrawableCompat avd;
     AnimatedVectorDrawable avd2;
 
+    private Context mContext;
+
     String userLogin, eventDate;
 
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("user");
@@ -80,6 +78,8 @@ public class AbsenFragment extends Fragment {
 
     double aoiLat;
     double aoiLong;
+
+    int distance;
 
     double latitude;
     double longitude;
@@ -180,9 +180,11 @@ public class AbsenFragment extends Fragment {
                 if (snapshot.exists()) {
                     String latitudeValue = snapshot.child("sLatitude").getValue().toString();
                     String longitudeValue = snapshot.child("sLongitude").getValue().toString();
+                    String distanceValue = snapshot.child("sDistance").getValue().toString();
 
                     aoiLat = Double.parseDouble(latitudeValue);
                     aoiLong = Double.parseDouble(longitudeValue);
+                    distance = Integer.parseInt(distanceValue);
                 } else {
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                     builder.setTitle("Warning")
@@ -214,15 +216,15 @@ public class AbsenFragment extends Fragment {
         builder.setPositiveButton("Submit", (dialog, which) -> {
             progressBar.setVisibility(View.INVISIBLE);
             String keterangan = ket.getEditText().getText().toString();
-            String tggl = AbsenFragment.this.dateRekap.format(new Date().getTime());
             String jamAbsen = AbsenFragment.this.jamAbsen.format(new Date().getTime());
             String stathadir = "izin";
 
            AbsenData absenData = new AbsenData(stathadir, jamAbsen, keterangan);
-           databaseReference.child(userLogin).child("sAbsensi").child(tggl).setValue(absenData).addOnFailureListener(e -> {
+           databaseReference.child(userLogin).child("sAbsensi").child(eventDate).setValue(absenData).addOnSuccessListener(unused -> {
+               validIzin();
+           }).addOnFailureListener(e -> {
                Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
            });
-           dialog.dismiss();
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> {
            dialog.cancel();
@@ -244,7 +246,7 @@ public class AbsenFragment extends Fragment {
         TimerTask timerTask = new TimerTask(){
             @Override
             public void run(){
-                jam.setText(AbsenFragment.this.jamFormat.format(new Date().getTime()));
+                jam.setText(jamFormat.format(new Date().getTime()));
             }
         };
         timer.schedule(timerTask, 0, 1000);
@@ -303,7 +305,7 @@ public class AbsenFragment extends Fragment {
         float[] results = new float[1];
         Location.distanceBetween(aoiLat, aoiLong, latitude, longitude, results);
         float distanceInMeters = results[0];
-        return distanceInMeters < 100;
+        return distanceInMeters < distance;
     }
 
     private void absenRekap(){
@@ -335,9 +337,9 @@ public class AbsenFragment extends Fragment {
                        waktuAbsen.setText(jamAbsen);
                        inhere.setText(ketHadir);
                        validIzin();
-                   } else {
-                       seleksiAbsen();
                    }
+               } else {
+                   seleksiAbsen();
                }
            }
 
@@ -364,24 +366,24 @@ public class AbsenFragment extends Fragment {
         hadir.setClickable(false);
         hadir.setEnabled(true);
         hadir.setBackgroundColor(Color.GREEN);
-        izin.setBackgroundColor(getResources().getColor(R.color.shot_black));
+        izin.setBackgroundColor(ContextCompat.getColor(mContext, R.color.shot_black));
     }
 
     private void validIzin(){
         done.setVisibility(View.INVISIBLE);
         hadir.setEnabled(false);
-        izin.setClickable(false);
         izin.setEnabled(true);
-        izin.setBackgroundColor(getResources().getColor(R.color.orange));
-        hadir.setBackgroundColor(getResources().getColor(R.color.shot_black));
+        izin.setClickable(false);
+        izin.setBackgroundColor(ContextCompat.getColor(mContext, R.color.orange));
+        hadir.setBackgroundColor(ContextCompat.getColor(mContext, R.color.shot_black));
     }
 
     private void validNoData(){
         done.setVisibility(View.INVISIBLE);
         izin.setEnabled(false);
         hadir.setEnabled(false);
-        hadir.setBackgroundColor(getResources().getColor(R.color.shot_black));
-        izin.setBackgroundColor(getResources().getColor(R.color.shot_black));
+        hadir.setBackgroundColor(ContextCompat.getColor(mContext, R.color.shot_black));
+        izin.setBackgroundColor(ContextCompat.getColor(mContext, R.color.shot_black));
     }
 
     private void belumAbsen(){
@@ -390,25 +392,32 @@ public class AbsenFragment extends Fragment {
         izin.setClickable(true);
         hadir.setEnabled(true);
         hadir.setClickable(true);
-        izin.setBackgroundColor(getResources().getColor(R.color.purple_500));
-        hadir.setBackgroundColor(getResources().getColor(R.color.purple_500));
+        izin.setBackgroundColor(ContextCompat.getColor(mContext, R.color.purple_500));
+        hadir.setBackgroundColor(ContextCompat.getColor(mContext, R.color.purple_500));
     }
 
     private void seleksiAbsen(){
         String curentDate = dateFormat.format(calendar.getTime());
-        String tgglNow = AbsenFragment.this.dateFormat.format(new Date().getTime());
+        String tgglNow = dateFormat.format(new Date().getTime());
         if (curentDate.equals(tgglNow)){
             nxt.setEnabled(false);
-            nxt.setImageDrawable(getResources().getDrawable(R.drawable.ic_next_disabled));
+            nxt.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_next_disabled));
             belumAbsen();
             waktuAbsen.setText("-");
             inhere.setText("Anda belum absen hari ini!");
         } else {
             nxt.setEnabled(true);
-            nxt.setImageDrawable(getResources().getDrawable(R.drawable.ic_next));
+            nxt.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_next));
             validNoData();
             waktuAbsen.setText("-");
             inhere.setText("Tidak ada data absen!");
         }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (mContext == null)
+            mContext = context.getApplicationContext();
     }
 }

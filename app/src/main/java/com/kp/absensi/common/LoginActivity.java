@@ -19,7 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.kp.absensi.admin.AdminActivity;
-import com.kp.absensi.MainActivity;
+import com.kp.absensi.user.UserActivity;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
 
@@ -40,13 +40,10 @@ public class LoginActivity extends AppCompatActivity {
         passwordValid = findViewById(R.id.login_password);
 
         Button login = findViewById(R.id.login_button);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!validateUsername() | !validatePassword()) {
-                } else {
-                    turnLogin();
-                }
+        login.setOnClickListener(v -> {
+            if (!validateUsername() | !validatePassword()) {
+            } else {
+                turnLogin();
             }
         });
 
@@ -86,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                             Preferences.setDataStatus(LoginActivity.this, status);
                             Preferences.setDataNama(LoginActivity.this, nameFromDB);
                             Preferences.setDataUsername(LoginActivity.this, input1);
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, UserActivity.class);
                             startActivity(intent);
                         }
                     } else {
@@ -157,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(this, AdminActivity.class));
                 finish();
             } else {
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this, UserActivity.class));
                 finish();
             }
         }

@@ -1,8 +1,16 @@
-package com.kp.absensi.ui.absen;
+package com.kp.absensi.user.ui.absen;
 
 public class AbsenData {
 
-    String sKehadiran, sJam, sKet;
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    String key, sKehadiran, sJam, sKet;
 
     public String getsKehadiran() {
         return sKehadiran;

@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/navigation_absen"
-        android:name="com.kp.absensi.ui.absen.AbsenFragment"
+        android:name="com.kp.absensi.user.ui.absen.AbsenFragment"
         android:label="@string/title_absen"
         tools:layout="@layout/fragment_absen" />
 
     <fragment
         android:id="@+id/navigation_account"
-        android:name="com.kp.absensi.ui.akun.AkunFragment"
+        android:name="com.kp.absensi.user.ui.akun.AkunFragment"
         android:label="Profil"
         tools:layout="@layout/fragment_akun" />
 </navigation>

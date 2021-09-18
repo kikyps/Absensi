@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kp.absensi" >
-
+    package="com.kp.absensi">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
          location permissions for the "MyLocation" functionality.
     -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- Permission -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Permission -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
@@ -21,13 +18,19 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Location" >
+        android:theme="@style/Theme.Location">
+        <activity
+            android:name=".admin.ui.karyawan.RekapAbsen"
+            android:exported="true"
+            android:label="Rekap Absensi"
+            android:theme="@style/Theme.Location.NoActionBar"/>
         <activity
             android:name=".admin.AdminActivity"
             android:exported="true"
-            android:label="@string/admin_title"/>
+            android:label="@string/title_activity_admin_main"
+            android:theme="@style/Theme.Location.NoActionBar" />
         <activity
-            android:name=".ui.akun.EditProfile"
+            android:name=".user.ui.akun.EditProfile"
             android:exported="true"
             android:label="Edit profil" />
         <activity
@@ -35,7 +38,7 @@
             android:exported="true"
             android:theme="@style/Theme.Location.NoActionBar" />
         <activity
-            android:name=".MainActivity"
+            android:name=".user.UserActivity"
             android:exported="true"
             android:label="@string/title_activity_main" />
         <activity
@@ -44,7 +47,7 @@
         <activity
             android:name=".common.LoginActivity"
             android:exported="true"
-            android:theme="@style/Theme.Location.NoActionBar" >
+            android:theme="@style/Theme.Location.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

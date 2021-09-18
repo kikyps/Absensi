@@ -1,17 +1,26 @@
 package com.kp.absensi.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class StoreUser {
 
-    String sStatus, sNama, sUsername, sPassword;
+    String key;
+    String sStatus;
+    String sNama;
+    String sUsername;
+    String sPassword;
 
     public StoreUser(String sStatus, String sNama, String sUsername, String sPassword) {
         this.sStatus = sStatus;
         this.sNama = sNama;
         this.sUsername = sUsername;
         this.sPassword = sPassword;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getsStatus() {

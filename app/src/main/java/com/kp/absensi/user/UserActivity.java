@@ -1,7 +1,6 @@
-package com.kp.absensi;
+package com.kp.absensi.user;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -19,10 +18,12 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kp.absensi.Preferences;
+import com.kp.absensi.R;
 import com.kp.absensi.common.LoginActivity;
-import com.kp.absensi.ui.absen.AbsenFragment;
+import com.kp.absensi.user.ui.absen.AbsenFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class UserActivity extends AppCompatActivity {
 
     AbsenFragment fragment = new AbsenFragment();
     boolean doubleBackToExitPressedOnce;
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_user_main);
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.logout:
+            case R.id.user_logout:
                 onLogOut();
                 return true;
             default:
