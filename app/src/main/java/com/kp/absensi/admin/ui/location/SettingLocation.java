@@ -113,6 +113,10 @@ public class SettingLocation extends Fragment {
                     latitude.getEditText().setText(latitudeValue);
                     longitude.getEditText().setText(longitudeValue);
                     distance.getEditText().setText(jarak);
+
+                    latitude.getEditText().clearFocus();
+                    longitude.getEditText().clearFocus();
+                    distance.getEditText().clearFocus();
                 } else {
                     Toast.makeText(mContext, "Data kosong", Toast.LENGTH_SHORT).show();
                 }

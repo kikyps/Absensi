@@ -164,7 +164,6 @@ public class EditProfile extends AppCompatActivity {
                 .setPositiveButton("ya", (dialogInterface, i) -> {
                     String val = passwordLama.getEditText().getText().toString().trim();
                     String val2 = passwordBaru.getEditText().getText().toString().trim();
-                    String val3 = confirmPass.getEditText().getText().toString().trim();
                     String name = editNama.getEditText().getText().toString();
 
                     if (!name.isEmpty() && val.isEmpty()){
@@ -174,6 +173,7 @@ public class EditProfile extends AppCompatActivity {
                         databaseReference.child("user").child(usernameData).updateChildren(updatesNama).addOnSuccessListener(unused -> {
                             Preferences.setDataNama(this, name);
                             Toast.makeText(getApplicationContext(), "Data berhasil di edit", Toast.LENGTH_SHORT).show();
+                            editNama.getEditText().clearFocus();
                         }).addOnFailureListener(e -> {
                             Toast.makeText(getApplicationContext(), "Terjadi kesalahan saat mengedit data, periksa koneksi internet dan coba lagi!", Toast.LENGTH_LONG).show();
                         });
@@ -194,6 +194,9 @@ public class EditProfile extends AppCompatActivity {
                                 passwordLama.getEditText().setText(null);
                                 passwordBaru.getEditText().setText(null);
                                 confirmPass.getEditText().setText(null);
+                                passwordLama.getEditText().clearFocus();
+                                passwordBaru.getEditText().clearFocus();
+                                confirmPass.getEditText().clearFocus();
                             }).addOnFailureListener(e -> {
                                 Toast.makeText(getApplicationContext(), "Terjadi kesalahan saat mengedit data, periksa koneksi internet dan coba lagi!", Toast.LENGTH_LONG).show();
                             });

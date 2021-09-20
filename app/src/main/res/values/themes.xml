@@ -20,6 +20,7 @@
     <style name="Theme.Penggajian.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="Theme.Location.NoActionBar">
+        <item name="fontFamily">@font/ubuntu_medium</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

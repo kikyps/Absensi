@@ -25,6 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.kp.absensi.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class DataKaryawan extends Fragment {
 
@@ -50,13 +52,13 @@ public class DataKaryawan extends Fragment {
     private void layoutbinding(View root) {
         recyclerView = root.findViewById(R.id.rv_view);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager mLayout = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager mLayout = new LinearLayoutManager(mContext);
         recyclerView.setLayoutManager(mLayout);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         filterData = root.findViewById(R.id.filter_data);
         swipeRefreshLayout = root.findViewById(R.id.swiper);
-
         swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(mContext, R.color.purple_500));
+        Collections.sort(listUser, DataStore.dataStoreComparator);
     }
 
     private void listenerAction(){
