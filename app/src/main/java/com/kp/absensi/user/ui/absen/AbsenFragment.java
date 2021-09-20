@@ -110,6 +110,7 @@ public class AbsenFragment extends Fragment {
         hadir = root.findViewById(R.id.hadir);
         izin = root.findViewById(R.id.izin);
         nxt = root.findViewById(R.id.next);
+
         prev = root.findViewById(R.id.previous);
         done = root.findViewById(R.id.icon_done);
         waktuAbsen = root.findViewById(R.id.jam_absen);
@@ -177,7 +178,11 @@ public class AbsenFragment extends Fragment {
         dataLatlong.child("data").child("latlong").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
+                if (!snapshot.exists()) {
+                    comeBack();
+                } else if (snapshot.child("sLatitude").getValue().toString().isEmpty() && snapshot.child("sLongitude").getValue().toString().isEmpty() && !snapshot.child("sDistance").getValue().toString().toString().isEmpty()){
+                    comeBack();
+                } else {
                     String latitudeValue = snapshot.child("sLatitude").getValue().toString();
                     String longitudeValue = snapshot.child("sLongitude").getValue().toString();
                     String distanceValue = snapshot.child("sDistance").getValue().toString();
@@ -185,16 +190,6 @@ public class AbsenFragment extends Fragment {
                     aoiLat = Double.parseDouble(latitudeValue);
                     aoiLong = Double.parseDouble(longitudeValue);
                     distance = Integer.parseInt(distanceValue);
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                    builder.setTitle("Warning")
-                            .setMessage("Data kordinat kosong, isikan kordinat lokasi absen untuk menggunakan aplikasi ini!\n\nAtau anda bisa menghubungi admin.")
-                            .setPositiveButton("Oke", (dialogInterface, i) -> {
-                                startActivity(new Intent(requireContext(), LoginActivity.class));
-                                Preferences.clearData(requireContext());
-                            });
-                    builder.setCancelable(false);
-                    builder.show();
                 }
             }
 
@@ -203,6 +198,18 @@ public class AbsenFragment extends Fragment {
 
             }
         });
+    }
+
+    private void comeBack(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Warning")
+                .setMessage("Data kordinat kosong, isikan kordinat lokasi absen untuk menggunakan aplikasi ini!\n\nAtau anda bisa menghubungi admin.")
+                .setPositiveButton("Oke", (dialogInterface, i) -> {
+                    startActivity(new Intent(requireContext(), LoginActivity.class));
+                    Preferences.clearData(requireContext());
+                });
+        builder.setCancelable(false);
+        builder.show();
     }
 
     private void dialogKeterangan() {
@@ -262,11 +269,11 @@ public class AbsenFragment extends Fragment {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION_PERMISSION);
         } else {
-            LocationServices.getFusedLocationProviderClient(getContext()).requestLocationUpdates(locationRequest, new LocationCallback() {
+            LocationServices.getFusedLocationProviderClient(mContext).requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult locationResult) {
                     super.onLocationResult(locationResult);
-                    LocationServices.getFusedLocationProviderClient(getContext()).removeLocationUpdates(this);
+                    LocationServices.getFusedLocationProviderClient(mContext).removeLocationUpdates(this);
                     if (locationResult.getLocations().size() > 0){
                         int latestLocationIndex = locationResult.getLocations().size() - 1;
                         latitude = locationResult.getLocations().get(latestLocationIndex).getLatitude();
