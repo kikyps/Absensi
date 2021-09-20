@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -43,7 +44,7 @@ public class SettingLocation extends Fragment {
 
     private Context mContext;
 
-    ProgressBar progressBar;
+    LinearLayout progressBar;
 
     LocationManager locationManager;
     boolean GpsStatus;
@@ -70,8 +71,28 @@ public class SettingLocation extends Fragment {
         longText.addTextChangedListener(latlong);
         distanceText.addTextChangedListener(latlong);
         showLatLong();
+        layoutListener();
         GPSStatus();
         return root;
+    }
+
+    private void layoutListener(){
+        save.setOnLongClickListener(view -> {
+            if (!GpsStatus){
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+                builder.setTitle("Location Manager")
+                        .setMessage("Aktifkan lokasi untuk melihat titik lokasi anda!")
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        })
+                        .setCancelable(true)
+                        .show();
+            } else {
+                setLatLong();
+            }
+            return true;
+        });
     }
 
     @Override
