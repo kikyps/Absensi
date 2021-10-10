@@ -1,6 +1,5 @@
 package com.kp.absensi;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-import com.kp.absensi.common.LoginActivity;
 
 public class Preferences {
 
@@ -135,9 +133,7 @@ public class Preferences {
                                 } catch (Exception e){
                                     Toast.makeText(context.getApplicationContext(), "Terjadi Kesalahan, Coba lagi!", Toast.LENGTH_SHORT).show();
                                 }
-                            }).setNeutralButton("Ingat nanti", (dialogInterface, i) -> {
-                        Preferences.setUpdateDialog(context, true);
-                    }).setCancelable(true).show();
+                            }).setNeutralButton("Ingat nanti", (dialogInterface, i) -> Preferences.setUpdateDialog(context, true)).setCancelable(true).show();
                 }
             }
 
@@ -157,4 +153,6 @@ public class Preferences {
         }
         return packageInfo.versionCode;
     }
+
+
 }
