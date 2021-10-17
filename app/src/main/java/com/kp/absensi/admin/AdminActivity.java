@@ -67,7 +67,9 @@ public class AdminActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!Preferences.getUpdateDialog(this)){
+        if (!Preferences.isConnected(this)){
+            Preferences.dialogNetwork(this);
+        } else if (!Preferences.getUpdateDialog(this)){
             Preferences.checkUpdate(this);
         }
     }

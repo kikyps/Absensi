@@ -1,5 +1,6 @@
 package com.kp.absensi.common;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private TextInputLayout usernameValid, passwordValid;
     boolean doubleBackToExitPressedOnce;
+    private ProgressDialog progressDialog;
 
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -38,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
 
         usernameValid = findViewById(R.id.login_username);
         passwordValid = findViewById(R.id.login_password);
+        progressDialog = new ProgressDialog(this, R.style.AppCompatAlertDialogStyle);  //progress dialog
 
         Button login = findViewById(R.id.login_button);
         login.setOnClickListener(v -> {
@@ -57,48 +60,56 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void turnLogin() {
-        String input1 = usernameValid.getEditText().getText().toString();
-        String input2 = passwordValid.getEditText().getText().toString();
+        if (!Preferences.isConnected(this)){
+            Preferences.dialogNetwork(this);
+        } else {
+            progressDialog.setMessage("Please Wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+            String input1 = usernameValid.getEditText().getText().toString();
+            String input2 = passwordValid.getEditText().getText().toString();
 
-        Query checkUser = databaseReference.child("user").orderByChild("sUsername").equalTo(input1);
+            Query checkUser = databaseReference.child("user").orderByChild("sUsername").equalTo(input1);
 
-        checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String passwordFromDB = snapshot.child(input1).child("sPassword").getValue(String.class);
-                    String nameFromDB = snapshot.child(input1).child("sNama").getValue(String.class);
-                    String status = snapshot.child(input1).child("sStatus").getValue(String.class);
+            checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String passwordFromDB = snapshot.child(input1).child("sPassword").getValue(String.class);
+                        String nameFromDB = snapshot.child(input1).child("sNama").getValue(String.class);
+                        String status = snapshot.child(input1).child("sStatus").getValue(String.class);
 
-                    if (passwordFromDB.equals(input2)) {
-                        if (status.equals("admin")){
-                            Preferences.setDataLogin(LoginActivity.this, true);
-                            Preferences.setDataStatus(LoginActivity.this, status);
-                            Preferences.setDataNama(LoginActivity.this, nameFromDB);
-                            Preferences.setDataUsername(LoginActivity.this, input1);
-                            Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
-                            startActivity(intent);
-                        } else if (status.equals("user")) {
-                            Preferences.setDataLogin(LoginActivity.this, true);
-                            Preferences.setDataStatus(LoginActivity.this, status);
-                            Preferences.setDataNama(LoginActivity.this, nameFromDB);
-                            Preferences.setDataUsername(LoginActivity.this, input1);
-                            Intent intent = new Intent(LoginActivity.this, UserActivity.class);
-                            startActivity(intent);
+                        if (passwordFromDB.equals(input2)) {
+                            if (status.equals("admin")) {
+                                Preferences.setDataLogin(LoginActivity.this, true);
+                                Preferences.setDataStatus(LoginActivity.this, status);
+                                Preferences.setDataNama(LoginActivity.this, nameFromDB);
+                                Preferences.setDataUsername(LoginActivity.this, input1);
+                                Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                                startActivity(intent);
+                            } else if (status.equals("user")) {
+                                Preferences.setDataLogin(LoginActivity.this, true);
+                                Preferences.setDataStatus(LoginActivity.this, status);
+                                Preferences.setDataNama(LoginActivity.this, nameFromDB);
+                                Preferences.setDataUsername(LoginActivity.this, input1);
+                                Intent intent = new Intent(LoginActivity.this, UserActivity.class);
+                                startActivity(intent);
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Password salah!", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(getApplicationContext(), "Password salah!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Akun tidak terdaftar!", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Akun tidak terdaftar!", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        }
         }
 
     private boolean validateUsername(){

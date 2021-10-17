@@ -22,11 +22,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 public class DataKaryawan extends Fragment {
 
@@ -50,6 +50,7 @@ public class DataKaryawan extends Fragment {
     }
 
     private void layoutbinding(View root) {
+        Preferences.customProgresBar(getContext());
         recyclerView = root.findViewById(R.id.rv_view);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayout = new LinearLayoutManager(mContext);
@@ -104,7 +105,10 @@ public class DataKaryawan extends Fragment {
                         DataStore storeUser = item.getValue(DataStore.class);
                         storeUser.setKey(item.getKey());
                         listUser.add(storeUser);
+                        Preferences.progressDialog.dismiss();
                     }
+                } else {
+                    Preferences.progressDialog.dismiss();
                 }
                 absenRecyclerAdapter = new AbsenRecyclerAdapter(listUser, mContext);
                 recyclerView.setAdapter(absenRecyclerAdapter);

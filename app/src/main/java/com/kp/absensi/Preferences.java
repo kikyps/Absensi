@@ -1,12 +1,16 @@
 package com.kp.absensi;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,6 +28,7 @@ public class Preferences {
     public static int currentVersionCode;
     public static FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
     public static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    public static ProgressDialog progressDialog;
 
     private static final String DATA_LOGIN = "status_login",
             DATA_NAMA = "nama", DATA_USERNAME = "username"
@@ -114,6 +119,31 @@ public class Preferences {
                 }
             }
         });
+    }
+
+    public static void dialogNetwork(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("Tidak ada koneksi internet, silahkan hubungkan ke internet!")
+                .setTitle("No Internet!")
+                .setCancelable(true)
+                .setPositiveButton("Connect", (dialog, which) ->
+                        context.startActivity(new Intent(Settings.ACTION_DATA_USAGE_SETTINGS))).create().show();
+    }
+
+    public static boolean isConnected(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        return (wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected());
+    }
+
+    public static void customProgresBar(Context context){
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        progressDialog.setContentView(R.layout.cutom_progress_bar);
+        progressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
 
     public static void showUpdateDialog(Context context){
