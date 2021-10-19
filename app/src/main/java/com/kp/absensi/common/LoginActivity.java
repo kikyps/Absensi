@@ -1,16 +1,24 @@
 package com.kp.absensi.common;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
-import android.view.View;
+import android.provider.Settings;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -19,16 +27,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.kp.absensi.admin.AdminActivity;
-import com.kp.absensi.user.UserActivity;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
+import com.kp.absensi.admin.AdminActivity;
+import com.kp.absensi.user.UserActivity;
+
+import org.jetbrains.annotations.NotNull;
 
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputLayout usernameValid, passwordValid;
     boolean doubleBackToExitPressedOnce;
     private ProgressDialog progressDialog;
+    private static final int REQUEST_PERMISSION_CODE = 111;
 
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -63,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
         if (!Preferences.isConnected(this)){
             Preferences.dialogNetwork(this);
         } else {
-            progressDialog.setMessage("Please Wait...");
+            progressDialog.setMessage("Proses Login Tunggu Sebentar...");
             progressDialog.setCancelable(false);
             progressDialog.show();
             String input1 = usernameValid.getEditText().getText().toString();
@@ -154,6 +165,69 @@ public class LoginActivity extends AppCompatActivity {
             passwordValid.setError(null);
             passwordValid.setErrorEnabled(false);
             return true;
+        }
+    }
+
+    private boolean isPermissionGranted(){
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+            // For Android 11 (R)
+            return Environment.isExternalStorageManager();
+        } else {
+            // For Below
+            int readExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            int writeExternalStoreagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            return readExternalStoragePermission == PackageManager.PERMISSION_GRANTED && writeExternalStoreagePermission == PackageManager.PERMISSION_GRANTED;
+        }
+    }
+
+    private void takePermissions(){
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.addCategory("android.intent.category.DEFAULT");
+                intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
+                startActivityForResult(intent, 2296);
+            } catch (Exception exception){
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, 2296);
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_CODE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2296){
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+                if (Environment.isExternalStorageManager()){
+                    Toast.makeText(this, "Permission granted in android 11 and above", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull @NotNull String[] permissions, @NonNull @NotNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSION_CODE) {
+            if (grantResults.length > 0) {
+                boolean readExternalStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                boolean writeExternalStorage = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                if (readExternalStorage && writeExternalStorage) {
+                    Toast.makeText(this, "Permission granted in android 10 or below", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isPermissionGranted()) {
+            takePermissions();
         }
     }
 
