@@ -1,27 +1,22 @@
 package com.kp.absensi;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,8 +24,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-
-import org.jetbrains.annotations.NotNull;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class Preferences {
 
@@ -38,6 +33,7 @@ public class Preferences {
     public static FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
     public static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     public static ProgressDialog progressDialog;
+    public static StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
     private static final String DATA_LOGIN = "status_login",
             DATA_NAMA = "nama", DATA_USERNAME = "username"
@@ -163,9 +159,7 @@ public class Preferences {
                 .setMinimumFetchIntervalInSeconds(5)
                 .build();
         remoteConfig.setConfigSettingsAsync(configSettings);
-
-
-
+        StorageReference reference = storageReference.child("app-release.apk");
         databaseReference.child("data").child("updateURL").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -181,7 +175,13 @@ public class Preferences {
                                     if (task.isSuccessful()){
                                         final String new_version_code = remoteConfig.getString("in_app_update");
                                         if (Integer.parseInt(new_version_code) > 0){
-                                            new DownloadTask(context).execute(url);
+                                            reference.getDownloadUrl().addOnSuccessListener(uri -> {
+                                                String urlUpdate = uri.toString();
+                                                new DownloadTask(context).execute(urlUpdate);
+                                            }).addOnFailureListener(e -> {
+                                                dialogInterface.cancel();
+                                                Toast.makeText(context.getApplicationContext(), "Terjadi Kesalahan, Coba lagi!", Toast.LENGTH_SHORT).show();
+                                            });
                                         } else {
                                             try {
                                                 context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));

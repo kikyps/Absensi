@@ -3,10 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable-v24/circle.xml" value="0.26614583333333336" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable-v24/img.xml" value="0.26614583333333336" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/avd_done.xml" value="0.25925925925925924" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/bg_filter.xml" value="0.27794871794871795" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/bg_rekap.xml" value="0.2703125" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/custom_bg_progressbar.xml" value="0.26614583333333336" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_account.xml" value="0.26614583333333336" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_next.xml" value="0.25925925925925924" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_previous.xml" value="0.2703125" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_previous_disabled.xml" value="0.2703125" />

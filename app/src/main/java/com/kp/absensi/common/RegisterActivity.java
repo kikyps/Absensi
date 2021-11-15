@@ -28,8 +28,6 @@ public class RegisterActivity extends AppCompatActivity {
 
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
-    String sNama, sUsername, sPassword;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,13 +46,10 @@ public class RegisterActivity extends AppCompatActivity {
     private void buttonListener(){
 
         Button register = findViewById(R.id.next2);
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!validateUsername() | !validateNama() | !validatePassword()){
-                } else {
-                    registerAccount();
-                }
+        register.setOnClickListener(v -> {
+            if (!validateUsername() | !validateNama() | !validatePassword()){
+            } else {
+                registerAccount();
             }
         });
 

@@ -2,11 +2,16 @@ package com.kp.absensi;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,9 +22,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class DownloadTask extends AsyncTask<String, Integer, String> {
-    private ProgressDialog mPDialog;
-    private Context mContext;
+    private final ProgressDialog mPDialog;
+    private final Context mContext;
     private PowerManager.WakeLock mWakeLock;
+    File fileApk;
     //Constructor parameters :
     // @context (current Activity)
     // @targetFile (File object to write,it will be overwritten if exist)
@@ -28,7 +34,7 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
         this.mContext = context;
         mPDialog = new ProgressDialog(context);
 
-        mPDialog.setMessage("Sedang Mengunduh Pembaruan....");
+        mPDialog.setMessage("Sedang Mengunduh Pembaruan...");
         mPDialog.setIndeterminate(true);
         mPDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mPDialog.setCancelable(false);
@@ -61,17 +67,18 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
             int fileLength = connection.getContentLength();
 
             // download the file
-            String rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-
-            File f = new File(rootPath + "update.apk");
-            if (f.exists()) {
-                f.delete();
+            String rootPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/";
+            String fileName = mContext.getResources().getString(R.string.app_name);
+            String fileType = ".apk";
+            fileApk = new File(rootPath + fileName + fileType);
+            if (fileApk.exists()) {
+                fileApk.delete();
             }
 
             input = connection.getInputStream();
-            output = new FileOutputStream(f,false);
+            output = new FileOutputStream(fileApk,false);
 
-            byte data[] = new byte[4096];
+            byte[] data = new byte[4096];
             long total = 0;
             int count;
             while ((count = input.read(data)) != -1) {
@@ -112,9 +119,7 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 getClass().getName());
         mWakeLock.acquire(10*60*1000L /*10 minutes*/);
-
         mPDialog.show();
-
     }
 
     @Override
@@ -124,7 +129,14 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
         mPDialog.setIndeterminate(false);
         mPDialog.setMax(100);
         mPDialog.setProgress(progress[0]);
+    }
 
+    private Uri getUriFromFile(File file){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            return Uri.fromFile(file);
+        } else {
+            return FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", fileApk);
+        }
     }
 
     @Override
@@ -132,9 +144,16 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
         Log.i("DownloadTask", "Work Done! PostExecute");
         mWakeLock.release();
         mPDialog.dismiss();
-        if (result != null)
-            Toast.makeText(mContext,"Download error: " + result, Toast.LENGTH_LONG).show();
-        else
-            Toast.makeText(mContext,"File Downloaded", Toast.LENGTH_SHORT).show();
+        if (result != null) {
+            Toast.makeText(mContext, "Download error: " + result, Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(mContext, "File Downloaded : " + fileApk.toString(), Toast.LENGTH_SHORT).show();
+            Intent installAppIntent = new Intent(Intent.ACTION_VIEW)
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK)
+                    .setDataAndType(getUriFromFile(fileApk), "application/vnd.android.package-archive")
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+            mContext.startActivity(installAppIntent);
+        }
     }
 }
