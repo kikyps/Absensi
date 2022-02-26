@@ -1,6 +1,7 @@
 package com.kp.absensi.user.ui.absen;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +45,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
 import com.kp.absensi.common.LoginActivity;
+import com.kp.absensi.user.UserActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -90,7 +92,7 @@ public class AbsenFragment extends Fragment {
     DateFormat jamAbsen = new SimpleDateFormat("HH:mm");
     Calendar calendar = Calendar.getInstance();
 
-    public static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
+    public static final int REQUEST_CODE_LOCATION_PERMISSION = 10;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -99,6 +101,7 @@ public class AbsenFragment extends Fragment {
         setJam();
         setTanggal();
         buttonOncreate();
+        progressBar.setVisibility(View.INVISIBLE);
         return root;
     }
 
@@ -226,12 +229,16 @@ public class AbsenFragment extends Fragment {
             String jamAbsen = AbsenFragment.this.jamAbsen.format(new Date().getTime());
             String stathadir = "izin";
 
-           AbsenData absenData = new AbsenData(stathadir, jamAbsen, keterangan);
-           databaseReference.child(userLogin).child("sAbsensi").child(eventDate).setValue(absenData).addOnSuccessListener(unused -> {
-               validIzin();
-           }).addOnFailureListener(e -> {
-               Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
-           });
+            if (keterangan.isEmpty()){
+                Toast.makeText(mContext, "Isi Keterangan Terlebih Dahulu!", Toast.LENGTH_SHORT).show();
+            } else {
+                AbsenData absenData = new AbsenData(stathadir, jamAbsen, keterangan);
+                databaseReference.child(userLogin).child("sAbsensi").child(eventDate).setValue(absenData).addOnSuccessListener(unused -> {
+                    validIzin();
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
+                });
+            }
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> {
            dialog.cancel();
@@ -260,15 +267,15 @@ public class AbsenFragment extends Fragment {
     }
 
     public void getCurrentLocation() {
-        progressBar.setVisibility(View.VISIBLE);
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(3000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION_PERMISSION);
         } else {
+            progressBar.setVisibility(View.VISIBLE);
+            LocationRequest locationRequest = new LocationRequest();
+            locationRequest.setInterval(10000);
+            locationRequest.setFastestInterval(3000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
             LocationServices.getFusedLocationProviderClient(mContext).requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
                 public void onLocationResult(@NonNull LocationResult locationResult) {
