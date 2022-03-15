@@ -5,18 +5,17 @@ import java.util.Comparator;
 public class DataStore {
 
     String key;
-    String sStatus;
     String sNama;
 
-    public DataStore(String sStatus, String sNama, String sUsername, String sPassword) {
-        this.sStatus = sStatus;
+    public DataStore(String key, String sNama) {
+        this.key = key;
         this.sNama = sNama;
     }
 
-    public static Comparator<DataStore> dataStoreComparator = (dataStore, t1) -> dataStore.getsNama().compareTo(t1.sNama);
-
     public DataStore(){
     }
+
+    public static Comparator<DataStore> dataStoreComparator = (dataStore, t1) -> dataStore.getsNama().compareTo(t1.sNama);
 
     public String getKey() {
         return key;
@@ -26,19 +25,7 @@ public class DataStore {
         this.key = key;
     }
 
-    public String getsStatus() {
-        return sStatus;
-    }
-
-    public void setsStatus(String sStatus) {
-        this.sStatus = sStatus;
-    }
-
     public String getsNama() {
         return sNama;
-    }
-
-    public void setsNama(String sNama) {
-        this.sNama = sNama;
     }
 }

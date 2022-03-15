@@ -21,7 +21,7 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
-        android:name=".common.Collector"
+        android:name=".common.Utills"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -36,7 +36,7 @@
             android:label="@string/crash_txt"
             android:theme="@style/Theme.Crash"/>
         <activity
-            android:name=".common.Collector"
+            android:name=".common.Utills"
             android:exported="false" />
         <activity
             android:name=".admin.ui.karyawan.RekapAbsen"
@@ -62,7 +62,8 @@
             android:label="@string/title_activity_main" />
         <activity
             android:name=".CheckMyLocation"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Theme.Location.NoActionBar"/>
         <activity
             android:name=".common.LoginActivity"
             android:exported="true"

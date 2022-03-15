@@ -1,7 +1,6 @@
 package com.kp.absensi.user.ui.absen;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -31,7 +30,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -45,7 +43,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
 import com.kp.absensi.common.LoginActivity;
-import com.kp.absensi.user.UserActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -60,7 +57,6 @@ public class AbsenFragment extends Fragment {
     TextView inhere, tanggal, jam, waktuAbsen;
     Button hadir, izin;
     ProgressBar progressBar;
-    FusedLocationProviderClient LocationProvider;
     ImageButton nxt, prev;
     ImageView done;
     AnimatedVectorDrawableCompat avd;
@@ -92,7 +88,7 @@ public class AbsenFragment extends Fragment {
     DateFormat jamAbsen = new SimpleDateFormat("HH:mm");
     Calendar calendar = Calendar.getInstance();
 
-    public static final int REQUEST_CODE_LOCATION_PERMISSION = 10;
+    public static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -118,7 +114,6 @@ public class AbsenFragment extends Fragment {
         done = root.findViewById(R.id.icon_done);
         waktuAbsen = root.findViewById(R.id.jam_absen);
         progressBar = root.findViewById(R.id.progresbar);
-        LocationProvider = LocationServices.getFusedLocationProviderClient(requireContext());
     }
 
     private void buttonOncreate(){
@@ -139,7 +134,8 @@ public class AbsenFragment extends Fragment {
         });
 
         izin.setOnClickListener(v -> {
-            dialogKeterangan();
+//            dialogKeterangan();
+            throw new RuntimeException("Boom!");
         });
 
         nxt.setOnClickListener(v -> {
@@ -183,7 +179,7 @@ public class AbsenFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
                     comeBack();
-                } else if (snapshot.child("sLatitude").getValue().toString().isEmpty() && snapshot.child("sLongitude").getValue().toString().isEmpty() && !snapshot.child("sDistance").getValue().toString().toString().isEmpty()){
+                } else if (snapshot.child("sLatitude").getValue().toString().isEmpty() && snapshot.child("sLongitude").getValue().toString().isEmpty() && !snapshot.child("sDistance").getValue().toString().isEmpty()){
                     comeBack();
                 } else {
                     String latitudeValue = snapshot.child("sLatitude").getValue().toString();
@@ -233,16 +229,10 @@ public class AbsenFragment extends Fragment {
                 Toast.makeText(mContext, "Isi Keterangan Terlebih Dahulu!", Toast.LENGTH_SHORT).show();
             } else {
                 AbsenData absenData = new AbsenData(stathadir, jamAbsen, keterangan);
-                databaseReference.child(userLogin).child("sAbsensi").child(eventDate).setValue(absenData).addOnSuccessListener(unused -> {
-                    validIzin();
-                }).addOnFailureListener(e -> {
-                    Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
-                });
+                databaseReference.child(userLogin).child("sAbsensi").child(eventDate).setValue(absenData).addOnSuccessListener(unused -> validIzin()).addOnFailureListener(e -> Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show());
             }
         });
-        builder.setNegativeButton("Cancel", (dialog, which) -> {
-           dialog.cancel();
-        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
@@ -266,9 +256,10 @@ public class AbsenFragment extends Fragment {
         timer.schedule(timerTask, 0, 1000);
     }
 
+
     public void getCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION_PERMISSION);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_LOCATION_PERMISSION);
         } else {
             progressBar.setVisibility(View.VISIBLE);
             LocationRequest locationRequest = new LocationRequest();
@@ -281,12 +272,12 @@ public class AbsenFragment extends Fragment {
                 public void onLocationResult(@NonNull LocationResult locationResult) {
                     super.onLocationResult(locationResult);
                     LocationServices.getFusedLocationProviderClient(mContext).removeLocationUpdates(this);
-                    if (locationResult.getLocations().size() > 0){
+                    if (locationResult.getLocations().size() > 0) {
                         int latestLocationIndex = locationResult.getLocations().size() - 1;
                         latitude = locationResult.getLocations().get(latestLocationIndex).getLatitude();
                         longitude = locationResult.getLocations().get(latestLocationIndex).getLongitude();
 
-                        if (!inLocation()){
+                        if (!inLocation()) {
                             izin.setEnabled(true);
                             hadir.setClickable(true);
                             hadir.setBackgroundColor(Color.RED);
@@ -296,7 +287,7 @@ public class AbsenFragment extends Fragment {
                             validHadir();
                         }
                     }
-                        progressBar.setVisibility(View.INVISIBLE);
+                    progressBar.setVisibility(View.INVISIBLE);
                 }
             }, Looper.getMainLooper());
         }
@@ -329,9 +320,7 @@ public class AbsenFragment extends Fragment {
         String hadir = "hadir";
 
         AbsenData absenData = new AbsenData(hadir, jamAbsen, ketHadir);
-        databaseReference.child(userLogin).child("sAbsensi").child(tggl).setValue(absenData).addOnFailureListener(e -> {
-            Toast.makeText(requireContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show();
-        });
+        databaseReference.child(userLogin).child("sAbsensi").child(tggl).setValue(absenData).addOnFailureListener(e -> Toast.makeText(mContext, "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_SHORT).show());
     }
 
     private void showAbsenToday(){

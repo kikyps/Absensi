@@ -8,6 +8,7 @@
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/avd_done.xml" value="0.25925925925925924" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/bg_filter.xml" value="0.27794871794871795" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/bg_rekap.xml" value="0.2703125" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/bg_rekap_ttgl.xml" value="0.1765" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/custom_bg_progressbar.xml" value="0.26614583333333336" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_account.xml" value="0.26614583333333336" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/drawable/ic_next.xml" value="0.25925925925925924" />
@@ -44,6 +45,7 @@
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/admin_main.xml" value="0.25416666666666665" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/admin_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/bottom_nav_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/error_copy.xml" value="0.25" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/home_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/profile_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/Android-Project/Absensi/app/src/main/res/menu/user_menu.xml" value="0.25416666666666665" />
