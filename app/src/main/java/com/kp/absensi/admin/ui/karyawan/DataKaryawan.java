@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -46,10 +48,10 @@ public class DataKaryawan extends Fragment {
     ImageButton nxt, prev;
     LinearLayout dateArrow;
     TextView tanggal;
-    String eventDate;
-    DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
+    public static String eventDate;
+    public static DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy");
     DateFormat dateRekap = new SimpleDateFormat("ddMMyyyy");
-    Calendar calendar = Calendar.getInstance();
+    public static Calendar calendar = Calendar.getInstance();
     private Context mContext;
 
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -83,7 +85,7 @@ public class DataKaryawan extends Fragment {
 
     private void listenerAction(){
         filterData.addTextChangedListener(filter);
-        dateArrow.setVisibility(View.GONE);
+//        dateArrow.setVisibility(View.GONE);
 
         nxt.setOnClickListener(v -> {
             calendar.add(Calendar.DATE, 1);
@@ -146,6 +148,7 @@ public class DataKaryawan extends Fragment {
         eventDate = dateRekap.format(calendar.getTime());
         tanggal.setText(curentDate);
         seleksiAbsen();
+        showData();
     }
 
     private void seleksiAbsen(){
@@ -171,6 +174,7 @@ public class DataKaryawan extends Fragment {
                         if (storeUser != null) {
                             storeUser.setKey(item.getKey());
                         }
+
                         listUser.add(storeUser);
                         Preferences.progressDialog.dismiss();
                     }

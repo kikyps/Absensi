@@ -134,8 +134,8 @@ public class AbsenFragment extends Fragment {
         });
 
         izin.setOnClickListener(v -> {
-//            dialogKeterangan();
-            throw new RuntimeException("Boom!");
+            dialogKeterangan();
+//            throw new RuntimeException("Boom!");
         });
 
         nxt.setOnClickListener(v -> {

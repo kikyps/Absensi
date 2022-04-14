@@ -12,7 +12,7 @@ public class DataStore {
         this.sNama = sNama;
     }
 
-    public DataStore(){
+    public DataStore() {
     }
 
     public static Comparator<DataStore> dataStoreComparator = (dataStore, t1) -> dataStore.getsNama().compareTo(t1.sNama);
