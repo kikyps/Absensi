@@ -34,6 +34,8 @@ import com.kp.absensi.user.UserActivity;
 
 import org.jetbrains.annotations.NotNull;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputLayout usernameValid, passwordValid;
@@ -55,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Button login = findViewById(R.id.login_button);
         login.setOnClickListener(v -> {
-            if (!validateUsername() | !validatePassword()) {
+            if (!validateUsername() & !validatePassword()) {
             } else {
                 turnLogin();
             }
@@ -90,7 +92,9 @@ public class LoginActivity extends AppCompatActivity {
                         String nameFromDB = snapshot.child(input1).child("sNama").getValue(String.class);
                         String status = snapshot.child(input1).child("sStatus").getValue(String.class);
 
-                        if (passwordFromDB.equals(input2)) {
+                        BCrypt.Result result = BCrypt.verifyer().verify(input2.toCharArray(), passwordFromDB);
+
+                        if (result.verified) {
                             if (status.equals("admin")) {
                                 Preferences.setDataLogin(LoginActivity.this, true);
                                 Preferences.setDataStatus(LoginActivity.this, status);
@@ -237,11 +241,10 @@ public class LoginActivity extends AppCompatActivity {
         if (Preferences.getDataLogin(this)) {
             if (Preferences.getDataStatus(this).equals("admin")){
                 startActivity(new Intent(this, AdminActivity.class));
-                finish();
             } else {
                 startActivity(new Intent(this, UserActivity.class));
-                finish();
             }
+            finish();
         }
     }
 
@@ -255,11 +258,6 @@ public class LoginActivity extends AppCompatActivity {
 
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText(this, "Double-click untuk keluar", Toast.LENGTH_SHORT).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, 2000);
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 }

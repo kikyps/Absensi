@@ -50,7 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:textSize="17dp"
+                android:textSize="15dp"
                 android:text="Nama"/>
 
         <TextView
@@ -59,7 +59,7 @@
             android:layout_marginStart="10dp"
             android:id="@+id/sNama"
             android:text="nama"
-            android:textSize="20dp"
+            android:textSize="17dp"
             android:textColor="@color/black"/>
 
             <TextView
@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
-                android:textSize="17dp"
+                android:textSize="15dp"
                 android:text="Kehadiran"/>
 
             <TextView
@@ -76,7 +76,7 @@
                 android:layout_marginStart="10dp"
                 android:id="@+id/sHadir"
                 android:text="kehadiran"
-                android:textSize="20dp"
+                android:textSize="17dp"
                 android:textColor="@color/black"/>
 
         </LinearLayout>

@@ -22,6 +22,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.kp.absensi.R;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 public class RegisterActivity extends AppCompatActivity {
 
     TextInputLayout usernameValid, namaValid, passwordValid, confirmPassword;
@@ -39,8 +41,6 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPassword = findViewById(R.id.signup_retype_password);
 
         buttonListener();
-
-
     }
 
     private void buttonListener(){
@@ -65,6 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
         String sNama = namaValid.getEditText().getText().toString();
         String sUsername = usernameValid.getEditText().getText().toString().trim();
         String sPassword = confirmPassword.getEditText().getText().toString().trim();
+        String hashPassword = BCrypt.withDefaults().hashToString(12, sPassword.toCharArray());
         String sStatus = "user";
 
         Query checkUser = databaseReference.child("user").orderByChild("sUsername").equalTo(sUsername);
@@ -75,7 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (snapshot.exists()){
                     Toast.makeText(getApplicationContext(), "Akun dengan username " + sUsername + " sudah terdaftar!", Toast.LENGTH_SHORT).show();
                 } else {
-                    StoreUser storeUser = new StoreUser(sStatus, sNama, sUsername,sPassword);
+                    StoreUser storeUser = new StoreUser(sStatus, sNama, sUsername, hashPassword);
                     databaseReference.child("user").child(sUsername).setValue(storeUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {

@@ -20,6 +20,6 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="pengaturan_lokasi">pengaturan Lokasi</string>
     <string name="data_karyawan">Data Karyawan</string>
-    <string name="note_latlong">Latitude dan Longitude adalah titik kordinat lokasi yang akan ditentukan untuk menandai lokasi absensi.\n\nTekan dan tahan tombol save atau anda bisa kosongkan kolom latitude dan longitude untuk mensetting lokasi anda saat ini sebagai lokasi absensi karyawan.</string>
+    <string name="note_latlong">Latitude dan Longitude adalah titik kordinat lokasi yang akan ditentukan untuk menandai lokasi absensi.\n\nTekan dan tahan tombol save atau anda bisa kosongkan kolom latitude dan longitude untuk menentukan lokasi anda saat ini sebagai lokasi absensi karyawan.</string>
     <string name="crash_txt">Bug Report</string>
 </resources>
