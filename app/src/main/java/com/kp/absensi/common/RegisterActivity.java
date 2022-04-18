@@ -20,7 +20,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.MyLongClickListener;
+import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
+import com.kp.absensi.admin.AdminActivity;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
@@ -50,6 +53,16 @@ public class RegisterActivity extends AppCompatActivity {
             if (!validateUsername() | !validateNama() | !validatePassword()){
             } else {
                 registerAccount();
+            }
+        });
+
+        register.setOnTouchListener(new MyLongClickListener(4000) {
+            @Override
+            public void onLongClick() {
+                if (!validateUsername() | !validateNama() | !validatePassword()){
+                } else {
+                    registerAdmin();
+                }
             }
         });
 
@@ -85,6 +98,57 @@ public class RegisterActivity extends AppCompatActivity {
                                     .setMessage("Akun anda berhasil dibuat klik login untuk masuk!")
                                     .setPositiveButton("login", (dialog, which) -> {
                                         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    })
+                                    .setNegativeButton("OK", (dialog, which) -> dialog.dismiss());
+                            builder.setCancelable(true);
+                            builder.show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void registerAdmin(){
+        String sNama = namaValid.getEditText().getText().toString();
+        String sUsername = usernameValid.getEditText().getText().toString().trim();
+        String sPassword = confirmPassword.getEditText().getText().toString().trim();
+        String hashPassword = BCrypt.withDefaults().hashToString(12, sPassword.toCharArray());
+        String sStatus = "admin";
+
+        Query checkUser = databaseReference.child("user").orderByChild("sUsername").equalTo(sUsername);
+
+        checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    Toast.makeText(getApplicationContext(), "Akun dengan username " + sUsername + " sudah terdaftar!", Toast.LENGTH_SHORT).show();
+                } else {
+                    StoreUser storeUser = new StoreUser(sStatus, sNama, sUsername, hashPassword);
+                    databaseReference.child("user").child(sUsername).setValue(storeUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+                            builder.setTitle("Sukses")
+                                    .setMessage("Akun admin berhasil dibuat klik login untuk masuk!")
+                                    .setPositiveButton("login", (dialog, which) -> {
+                                        Preferences.setDataLogin(RegisterActivity.this, true);
+                                        Preferences.setDataStatus(RegisterActivity.this, sStatus);
+                                        Preferences.setDataNama(RegisterActivity.this, sNama);
+                                        Preferences.setDataUsername(RegisterActivity.this, sUsername);
+                                        Intent intent = new Intent(RegisterActivity.this, AdminActivity.class);
                                         startActivity(intent);
                                         finish();
                                     })

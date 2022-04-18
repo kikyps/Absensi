@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.MyLongClickListener;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
 
@@ -97,6 +98,13 @@ public class DataKaryawan extends Fragment {
             setTanggal();
         });
 
+        prev.setOnTouchListener(new MyLongClickListener(4000) {
+            @Override
+            public void onLongClick() {
+                throw new RuntimeException("Boom!");
+            }
+        });
+
         DatePickerDialog.OnDateSetListener date = (datePicker, year, monthOfYear, dayOfMonth) -> {
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, monthOfYear);
@@ -116,6 +124,17 @@ public class DataKaryawan extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             showData();
             swipeRefreshLayout.setRefreshing(false);
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!recyclerView.canScrollVertically(1) && dy != 0) {
+                    //Load more items here
+                    Toast.makeText(mContext, "End of item!", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
     }
 

@@ -13,7 +13,8 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -31,10 +32,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Location">
         <activity
+            android:name=".admin.AdminInfoActivity"
+            android:exported="false"
+            android:label="Admin Info"
+            android:theme="@style/Theme.Location.NoActionBar"/>
+        <activity
             android:name=".common.CollectorActivity"
             android:exported="true"
             android:label="@string/crash_txt"
-            android:theme="@style/Theme.Crash"/>
+            android:theme="@style/Theme.Crash" />
         <activity
             android:name=".common.Utills"
             android:exported="false" />
@@ -49,7 +55,7 @@
             android:label="@string/title_activity_admin_main"
             android:theme="@style/Theme.Location.NoActionBar" />
         <activity
-            android:name=".user.ui.akun.EditProfile"
+            android:name=".common.EditProfile"
             android:exported="true"
             android:label="Edit profil" />
         <activity
@@ -63,7 +69,7 @@
         <activity
             android:name=".CheckMyLocation"
             android:exported="true"
-            android:theme="@style/Theme.Location.NoActionBar"/>
+            android:theme="@style/Theme.Location.NoActionBar" />
         <activity
             android:name=".common.LoginActivity"
             android:exported="true"
@@ -77,7 +83,6 @@
         </activity>
 
         <service android:name=".FetchAddressIntentServices" />
-
 
         <meta-data
             android:name="preloaded_fonts"

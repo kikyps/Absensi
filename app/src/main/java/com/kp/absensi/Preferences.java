@@ -1,22 +1,25 @@
 package com.kp.absensi;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -107,6 +110,18 @@ public class Preferences {
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.remove(DATA_DIALOG);
         editor.apply();
+    }
+
+    public static boolean isPermissionGranted(Context context){
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+            // For Android 11 (R)
+            return Environment.isExternalStorageManager();
+        } else {
+            // For Below
+            int readExternalStoragePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
+            int writeExternalStoreagePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            return readExternalStoragePermission == PackageManager.PERMISSION_GRANTED && writeExternalStoreagePermission == PackageManager.PERMISSION_GRANTED;
+        }
     }
 
     public static void checkUpdate(Context context){

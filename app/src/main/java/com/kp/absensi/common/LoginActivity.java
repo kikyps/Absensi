@@ -18,7 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -172,18 +171,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isPermissionGranted(){
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
-            // For Android 11 (R)
-            return Environment.isExternalStorageManager();
-        } else {
-            // For Below
-            int readExternalStoragePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-            int writeExternalStoreagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            return readExternalStoragePermission == PackageManager.PERMISSION_GRANTED && writeExternalStoreagePermission == PackageManager.PERMISSION_GRANTED;
-        }
-    }
-
     private void takePermissions(){
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
             try {
@@ -230,8 +217,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!isPermissionGranted()) {
+        if (!Preferences.isPermissionGranted(this)) {
             takePermissions();
+        } else if (!Preferences.getUpdateDialog(this)){
+            Preferences.checkUpdate(this);
         }
     }
 

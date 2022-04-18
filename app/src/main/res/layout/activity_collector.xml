@@ -50,13 +50,29 @@
             android:gravity="bottom"
             android:layout_alignParentBottom="true"
             android:orientation="vertical">
-            <Button
+
+            <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <Button
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:text="Restart"
+                android:layout_weight="1"
                 android:id="@+id/restart_app"
                 android:layout_gravity="center" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Check Update"
+                    android:id="@+id/update_app"
+                    android:layout_weight="1"
+                    android:layout_gravity="center" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

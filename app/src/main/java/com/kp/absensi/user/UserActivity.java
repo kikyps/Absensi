@@ -50,6 +50,7 @@ public class UserActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main2);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
     }
 
     private void validAkun(){
@@ -66,7 +67,9 @@ public class UserActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!Preferences.getUpdateDialog(this)){
+        if (!Preferences.isConnected(this)){
+            Preferences.dialogNetwork(this);
+        } else if (!Preferences.getUpdateDialog(this)){
             Preferences.checkUpdate(this);
         }
     }

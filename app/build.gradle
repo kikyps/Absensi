@@ -12,8 +12,8 @@ android {
         applicationId "com.kp.absensi"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 16170422
-        versionName "1.6"
+        versionCode 20190422
+        versionName "2.0"
         multiDexEnabled false
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

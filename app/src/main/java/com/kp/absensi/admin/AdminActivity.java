@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,6 +43,8 @@ public class AdminActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     boolean doubleBackToExitPressedOnce;
     SettingLocation location = new SettingLocation();
+    TextView adminName;
+    LinearLayout infoAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,7 @@ public class AdminActivity extends AppCompatActivity {
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -62,6 +68,15 @@ public class AdminActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_admin_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        adminName = headerView.findViewById(R.id.admin_name);
+        adminName.setText(Preferences.getDataNama(this));
+
+        infoAdmin = headerView.findViewById(R.id.info_admin);
+        infoAdmin.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdminInfoActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override
@@ -71,6 +86,23 @@ public class AdminActivity extends AppCompatActivity {
             Preferences.dialogNetwork(this);
         } else if (!Preferences.getUpdateDialog(this)){
             Preferences.checkUpdate(this);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        validAkun();
+    }
+
+    private void validAkun(){
+        String username = Preferences.getDataUsername(this);
+        String nama = Preferences.getDataNama(this);
+
+        if (username.isEmpty() && nama.isEmpty()){
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            Preferences.clearData(getApplicationContext());
+            finish();
         }
     }
 

@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
-import com.kp.absensi.user.UserActivity;
+import com.kp.absensi.common.EditProfile;
 
 public class AkunFragment extends Fragment {
 

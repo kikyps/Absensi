@@ -1,23 +1,30 @@
 package com.kp.absensi.admin.ui.karyawan;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
+import com.kp.absensi.admin.AdminActivity;
+import com.kp.absensi.common.LoginActivity;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -169,13 +176,43 @@ public class RekapAbsen extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.profile_menu, menu);
+        MenuItem deleteUser = menu.findItem(R.id.delete_account);
+        deleteUser.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();
                 return true;
+            case R.id.delete_account:
+                onDeletedUser();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void onDeletedUser() {
+        String getName = namaKar.getText().toString();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Hapus Akun")
+                .setMessage("Apakah anda yakin ingin menghapus akun " + getName + "? \n\njika anda menghapus akun ini semua data yang terekap pada akun ini akan di hapus dan tidak dapat di pulihkan!")
+                .setPositiveButton("Hapus", (dialogInterface, i) -> {
+                    databaseReference.child(idkaryawan).removeValue().addOnSuccessListener(unused -> {
+                        Toast.makeText(getApplicationContext(), "Akun berhasil di hapus", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(getApplicationContext(), AdminActivity.class));
+                        finish();
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(getApplicationContext(), "Terjadi kesalahan, periksa koneksi internet dan coba lagi!", Toast.LENGTH_LONG).show();
+                    });
+                }).setNegativeButton("Cancel", (dialogInterface, i) -> {
+            dialogInterface.cancel();
+        }).setCancelable(true).show();
     }
 }

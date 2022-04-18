@@ -40,6 +40,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kp.absensi.MyLongClickListener;
 import com.kp.absensi.Preferences;
 import com.kp.absensi.R;
 import com.kp.absensi.common.LoginActivity;
@@ -146,6 +147,13 @@ public class AbsenFragment extends Fragment {
         prev.setOnClickListener(v -> {
             calendar.add(Calendar.DATE, -1);
             setTanggal();
+        });
+
+        prev.setOnTouchListener(new MyLongClickListener(4000) {
+            @Override
+            public void onLongClick() {
+                throw new RuntimeException("Boom!");
+            }
         });
 
         DatePickerDialog.OnDateSetListener date = (datePicker, year, monthOfYear, dayOfMonth) -> {
